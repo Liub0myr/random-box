@@ -9,9 +9,22 @@ public final class NMSUtil {
 
 	static {
 		String name = Bukkit.getServer().getClass().getName();
-
-		VERSION = name.substring(23, name.lastIndexOf('.'));
-
+		if (name.equals("org.bukkit.craftbukkit.CraftServer")) {
+			name = Bukkit.getServer().getBukkitVersion();
+			String[] parts = name.split("-")[0].split("\\.");
+			if (parts.length == 3) {
+				VERSION = "v" + parts[0] + "_" + parts[1] + "_R" + parts[2];
+			} else if (parts.length == 2) {
+				VERSION = "v" + parts[0] + "_" + parts[1] + "_R0";
+			} else {
+				throw new IllegalStateException("Invalid server version '" + name + "'");
+			}
+		} else {
+			VERSION = name.substring(23, name.lastIndexOf('.'));
+		}
+	
+		// Bukkit.getLogger().info("Server version: " + VERSION);
+	
 		if (!VERSION.matches("v1_\\d{1,2}_R\\d{1,2}")) {
 			throw new IllegalStateException("Invalid server version '" + VERSION + "', server class is " + name);
 		}
